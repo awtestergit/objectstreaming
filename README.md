@@ -1,14 +1,17 @@
 # objectstreaming
 In Python, convert object or wav object into byte sequence to be streamed between client and server.
 
-# wav streaming: typical use case is client side send audio wav (as a query) to LLM backend server, which receives the audio and use ASR to convert wav into text query, process the query, convert text answer into wav using TTS, and sends the wav back to the client.
-sample code:
+# wav streaming:
+typical use case is client side send audio wav (as a query) to LLM backend server, which receives the audio and use ASR to convert wav into text query, process the query, convert text answer into wav using TTS, and sends the wav back to the client.
 
+sample code:
+```python
 from wav_streaming import TALAudio, tal_encoder
 
 #helper function
+
 def audio_response_to_stream(audio_iter):
-    r = TALAudio()
+    r = TALAudio()  
     order = 0
     for audio in audio_iter:
         #the example of autio_iter is an iterator of [str, int, int, nd.array]
@@ -34,10 +37,13 @@ audio_iter = #somewhere in your code you get the iterator of audios
 rs = audio_response_to_stream(audio_iter)
 #fastapi streaming back to client use application/octet-stream mimetype
 return StreamingResponse(rs, media_type='application/octet-stream')
+```
 
-# object streaming: typical use case is client side send text query to LLM backend server in fastapi for example, which process the query, and answer back to client in stream.
+# object streaming:
+typical use case is client side send text query to LLM backend server in fastapi for example, which process the query, and answer back to client in stream.
+
 sample code:
-
+```
 from object_streaming import AnbJsonStreamCoder
 
 #helper function
@@ -61,4 +67,4 @@ async def convert_results_to_stream():
 rs = convert_results_to_stream()
 #fastapi streaming back to client use application/octet-stream mimetype
 return StreamingResponse(rs, media_type='application/octet-stream')
-
+```
