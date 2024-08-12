@@ -7,15 +7,19 @@
 #
 from pydantic import BaseModel, ConfigDict
 import json
-    
+
 class TALAudio(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True) # allow numpy array
+    
+    # overall the protocol include the basic audio format and the extra contents
+    
     # the audio format
     audioType:str = 'int16' # only allows 'int16' or 'int32'
     bitDepth:int = 16 # audio bit depth, only allows 16 (if audio type is int16) or 32 if int32
     sampleRate:int = 16000 # 16000
     channels:int = 1 #
     audioFormat:str = 'wav' #wav
+    
     # the extra contents, which can be adjusted for your app needs
     question:str = '' # question
     answer:str = '' #answer
