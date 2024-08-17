@@ -1,5 +1,15 @@
 # objectstreaming
-In Python, convert object or wav object into byte sequence to be streamed between client and server.
+In Python AI server, it often receives/sends client query in streaming, e.g., to receive a client query in text/audio stream format, and after AI server processes the query and sends test/audio streams back to client. This protocol implementation converts object or wav object into byte sequence to be streamed between client and server, and to be used in a typical use case like this:
+
+<p align='center'>
+    <img width="754" alt="Client and Server Streaming" src="https://github.com/user-attachments/assets/0488971e-3664-436b-9ef8-05dc08ff674f">
+</p>
+
+The client can be based on any codebase, as long as client and server follows the same protocol as shown in the figure below. The first 4 bytes are the total length of this byte sequence, and second 4 bytes are the length of your customized header object (in this case the header is TALAudio object), the following bytes in header length are the header object itself,  and the remaining bytes are the audio bytes.
+
+<p align='center'>
+    <img width="754" alt="Bytes protocol" src="https://github.com/user-attachments/assets/09acc6c8-2f1b-48f6-a76f-faedcf3f3ea5">
+</p>
 
 # wav streaming:
 typical use case is client side send audio wav (as a query) to LLM backend server, which receives the audio and use ASR to convert wav into text query, process the query, convert text answer into wav using TTS, and sends the wav back to the client.
