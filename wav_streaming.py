@@ -54,20 +54,39 @@ def tal_encoder(tal:TALAudio, wav:bytes=b'', byte_length = 4)->bytes:
     output = total_length_bytes + header + wav #concat
     return output
 
-def tal_decoder(obj:bytes, byte_length=4)->tuple[dict, bytes]:
+def tal_decoder(obj:bytes, byte_length=4)->None | tuple[(dict, bytes), any]:
     """
     input: bytes in the format of 'total_size|header_size|header|wav'
         decoder extract the header and wav
-    output: dict, wav (in bytes)
+    output: ([dict, wav (in bytes)], rest_bytes), (dict, wav) is the first chunk of wav, rest_bytes is the rest object if any
+        None if wav is only partial data
     """
+    whole_length = len(obj) # whole length
+
+    #byte_order = sys.byteorder
     byte_order = 'little' #fix to little between client and server
-    total_size = obj[:byte_length]
+    total_size = obj[:byte_length] # total size of this wav data incidated by header
     total_size = int.from_bytes(total_size, byteorder=byte_order)
+
+    # check total size vs whole length
+    if whole_length < total_size:
+        return None
+
     header_size = obj[byte_length:byte_length*2] #two byte_length
     header_size = int.from_bytes(header_size, byteorder=byte_order)# byteorder to consider
     header_size += byte_length*2 # the end of header in the byte sequence
     header = obj[byte_length*2:header_size] # bytes of tal object, starting at byte_length, end at header_size
+    #print(header_size)
+    #print(header)
     header = header.decode() # decode into str
+    #print()
+    #print(header)
     header = json.loads(header) # to dict
-    wav = obj[header_size:] #the rest is wav bytes
-    return header, wav
+    wav = obj[header_size:total_size] #the rest is wav bytes
+
+    # if whole length > total size, if nothing left, return b''
+    rest_bytes = obj[total_size:] if (whole_length > total_size) else b''
+
+    print(f"total_size: {total_size}, whole length: {whole_length}, rest bytes length: {len(rest_bytes)}")
+
+    return ((header, wav), rest_bytes)
