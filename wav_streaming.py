@@ -76,17 +76,11 @@ def tal_decoder(obj:bytes, byte_length=4)->None | tuple[(dict, bytes), any]:
     header_size = int.from_bytes(header_size, byteorder=byte_order)# byteorder to consider
     header_size += byte_length*2 # the end of header in the byte sequence
     header = obj[byte_length*2:header_size] # bytes of tal object, starting at byte_length, end at header_size
-    #print(header_size)
-    #print(header)
     header = header.decode() # decode into str
-    #print()
-    #print(header)
     header = json.loads(header) # to dict
     wav = obj[header_size:total_size] #the rest is wav bytes
 
     # if whole length > total size, if nothing left, return b''
     rest_bytes = obj[total_size:] if (whole_length > total_size) else b''
-
-    print(f"total_size: {total_size}, whole length: {whole_length}, rest bytes length: {len(rest_bytes)}")
 
     return ((header, wav), rest_bytes)
